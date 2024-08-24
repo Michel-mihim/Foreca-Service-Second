@@ -21,7 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class WeatherActivity : AppCompatActivity() {
 
     //переменные====================================================================================
-    private val forecaBaseUrl = "https://fnw-us.foreca.com"
+    private val forecaBaseUrl = "https://pfa.foreca.com"
     private var token = ""
     private val retrofit = Retrofit.Builder()
         .baseUrl(forecaBaseUrl)
@@ -106,7 +106,7 @@ class WeatherActivity : AppCompatActivity() {
     }
 
     private fun authenticate() {
-        forecaService.authenticate(ForecaAuthRequest("USER", "PASSWORD"))
+        forecaService.authenticate(ForecaAuthRequest("ya-mihim", "EYqeTJnoquds"))
             .enqueue(object : Callback<ForecaAuthResponse> {
                 override fun onResponse(call: Call<ForecaAuthResponse>,
                                         response: Response<ForecaAuthResponse>) {
