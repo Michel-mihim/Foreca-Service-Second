@@ -37,6 +37,9 @@ android {
 
 dependencies {
 
+    implementation ("io.reactivex.rxjava2:rxandroid:2.1.1")
+    implementation ("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation ("com.squareup.retrofit2:adapter-rxjava2:2.9.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

@@ -1,5 +1,6 @@
 package com.example.forecaservicesecond
 
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -12,13 +13,13 @@ interface ForecaApi {
     @POST("/authorize/token?expire_hours=-1")
     fun authenticate(
         @Body request: ForecaAuthRequest
-    ): Call<ForecaAuthResponse>
+    ): Single<ForecaAuthResponse>
 
     @GET("/api/v1/location/search/{query}")
     fun getLocations(
         @Header("Authorization") token: String,
         @Path("query") query: String
-    ): Call<LocationsResponse>
+    ): Single<LocationsResponse>
 
     @GET("/api/v1/current/{location}")
     fun getForecast(
