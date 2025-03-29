@@ -1,6 +1,7 @@
 package com.example.forecaservicesecond
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -21,8 +22,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class WeatherActivity : AppCompatActivity() {
 
     //переменные====================================================================================
-    private val forecaBaseUrl = "https://pfa.foreca.com"
-    private var token = ""
+    private val forecaBaseUrl = Constants.FORECA_URL
+    private var token = Constants.FORECA_TOKEN
     private val retrofit = Retrofit.Builder()
         .baseUrl(forecaBaseUrl)
         .addConverterFactory(GsonConverterFactory.create())
@@ -43,13 +44,8 @@ class WeatherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContentView(R.layout.activity_weather)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         placeholderMessage = findViewById(R.id.placeholderMessage)
         searchButton = findViewById(R.id.searchButton)
@@ -106,14 +102,16 @@ class WeatherActivity : AppCompatActivity() {
     }
 
     private fun authenticate() {
-        forecaService.authenticate(ForecaAuthRequest("ya-mihim", "EYqeTJnoquds"))
+        forecaService.authenticate(ForecaAuthRequest(Constants.FORECA_USER, Constants.FORECA_PASSWORD))
             .enqueue(object : Callback<ForecaAuthResponse> {
                 override fun onResponse(call: Call<ForecaAuthResponse>,
                                         response: Response<ForecaAuthResponse>) {
                     if (response.code() == 200) {
                         token = response.body()?.token.toString()
                         search()
+                        Log.d("wtf", token)
                     } else {
+                        Log.d("wtf", response.code().toString())
                         showMessage(getString(R.string.something_went_wrong), response.code().toString())
                     }
                 }
