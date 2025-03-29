@@ -110,11 +110,13 @@ class WeatherActivity : AppCompatActivity() {
                         token = response.body()?.token.toString()
                         search(token, Constants.HARDCODED_LOCATION)
                     } else {
+                        Log.e("RxJavaForeca", "Something went wrong with auth: ${response.code().toString()}")
                         showMessage(getString(R.string.something_went_wrong), response.code().toString())
                     }
                 }
 
                 override fun onFailure(call: Call<ForecaAuthResponse>, t: Throwable) {
+                    Log.e("RxJavaForeca", "onFailure auth request", t)
                     showMessage(getString(R.string.something_went_wrong), t.message.toString())
                 }
 
@@ -133,19 +135,28 @@ class WeatherActivity : AppCompatActivity() {
                                 locations.addAll(response.body()?.locations!!)
                                 adapter.notifyDataSetChanged()
                                 showMessage("", "")
+                                Log.d("RxJavaForeca", "Found locations!")
+                                locations.forEach {
+                                    Log.d("RxJavaForeca", it.toString())
+                                }
                             } else {
                                 showMessage(getString(R.string.nothing_found), "")
+                                Log.d("RxJavaForeca", "Nothing found")
                             }
 
                         }
                         401 -> authenticate()
-                        else -> showMessage(getString(R.string.something_went_wrong), response.code().toString())
+                        else -> {
+                            showMessage(getString(R.string.something_went_wrong), response.code().toString())
+                            Log.e("RxJavaForeca", "Something went wrong with search: ${response.code().toString()}")
+                        }
                     }
 
                 }
 
                 override fun onFailure(call: Call<LocationsResponse>, t: Throwable) {
                     showMessage(getString(R.string.something_went_wrong), t.message.toString())
+                    Log.e("RxJavaForeca", "onFailure search request", t)
                 }
 
             })
