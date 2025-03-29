@@ -1,3 +1,8 @@
 package com.example.forecaservicesecond
 
-class LocationsResponse(val locations: ArrayList<ForecastLocation>)
+import com.google.gson.annotations.SerializedName
+
+class LocationsResponse(
+    @SerializedName("locations")
+    val locations: ArrayList<ForecastLocation>
+)

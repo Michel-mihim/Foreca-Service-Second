@@ -7,4 +7,5 @@ object Constants {
     const val FORECA_ADM_PASSWORD = "DluHajjBSzQU"
     const val FORECA_URL = "https://pfa.foreca.com"
     const val FORECA_TOKEN = ""
+    const val HARDCODED_LOCATION = "Palma"
 }

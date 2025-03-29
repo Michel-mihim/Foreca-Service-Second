@@ -1,5 +1,12 @@
 package com.example.forecaservicesecond
 
-data class ForecastLocation(val id: Int,
-                            val name: String,
-                            val country: String)
+import com.google.gson.annotations.SerializedName
+
+data class ForecastLocation(
+    @SerializedName("id")
+    val id: Int,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("country")
+    val country: String
+)

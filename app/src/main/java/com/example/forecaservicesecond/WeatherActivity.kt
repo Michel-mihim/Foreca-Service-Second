@@ -58,13 +58,13 @@ class WeatherActivity : AppCompatActivity() {
         locationsList.adapter = adapter
 
         searchButton.setOnClickListener{
-            if (queryInput.text.isNotEmpty()) {
+            //if (queryInput.text.isNotEmpty()) {
                 if (token.isEmpty()) {
                     authenticate()
                 } else {
-                    search()
+                    search(token, Constants.HARDCODED_LOCATION)
                 }
-            }
+            //}
         }
     }
 
@@ -108,10 +108,8 @@ class WeatherActivity : AppCompatActivity() {
                                         response: Response<ForecaAuthResponse>) {
                     if (response.code() == 200) {
                         token = response.body()?.token.toString()
-                        search()
-                        Log.d("wtf", token)
+                        search(token, Constants.HARDCODED_LOCATION)
                     } else {
-                        Log.d("wtf", response.code().toString())
                         showMessage(getString(R.string.something_went_wrong), response.code().toString())
                     }
                 }
@@ -123,8 +121,8 @@ class WeatherActivity : AppCompatActivity() {
             })
     }
 
-    private fun search() {
-        forecaService.getLocations("Bearer $token", queryInput.text.toString())
+    private fun search(accessToken: String, searchQuery: String) {
+        forecaService.getLocations("Bearer $accessToken", searchQuery)
             .enqueue(object : Callback<LocationsResponse> {
                 override fun onResponse(call: Call<LocationsResponse>,
                                         response: Response<LocationsResponse>) {
