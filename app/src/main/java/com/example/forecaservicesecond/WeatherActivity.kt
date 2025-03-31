@@ -14,10 +14,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import okhttp3.MediaType
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -68,6 +72,7 @@ class WeatherActivity : AppCompatActivity() {
             //if (queryInput.text.isNotEmpty()) {
                 if (token.isEmpty()) {
                     authenticate()
+                    Log.d("RxJava", "authenticate activated")
                 } else {
                     search(token, Constants.HARDCODED_LOCATION)
                 }
@@ -108,6 +113,7 @@ class WeatherActivity : AppCompatActivity() {
         }
     }
 
+
     @SuppressLint("CheckResult")
     private fun authenticate() {
         forecaService.authenticate(ForecaAuthRequest(Constants.FORECA_USER, Constants.FORECA_PASSWORD))
@@ -116,6 +122,8 @@ class WeatherActivity : AppCompatActivity() {
 
                 val bearerToken = "Bearer ${tokenResponse.token}"
                 forecaService.getLocations(bearerToken, Constants.HARDCODED_LOCATION)
+            }.retry { count, throwable ->
+                count < 3 && throwable is HttpException && throwable.code() == 401
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -123,7 +131,9 @@ class WeatherActivity : AppCompatActivity() {
                 { locationsResponse ->
                     Log.d("RxJava", "Got locations: ${locationsResponse.locations}")
                 },
-                { error -> Log.e("RxJava", "Got error with auth or locations", error) }
+                { error ->
+                    Log.e("RxJava", "Got error with auth or locations", error)
+                }
             )
             /*
             .enqueue(object : Callback<ForecaAuthResponse> {
@@ -148,6 +158,7 @@ class WeatherActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("CheckResult")
     private fun search(accessToken: String, searchQuery: String) {
         forecaService.getLocations("Bearer $accessToken", searchQuery)
             .subscribeOn(Schedulers.io())
