@@ -1,5 +1,6 @@
 package com.example.forecaservicesecond
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,6 +14,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -105,8 +108,24 @@ class WeatherActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun authenticate() {
         forecaService.authenticate(ForecaAuthRequest(Constants.FORECA_USER, Constants.FORECA_PASSWORD))
+            .flatMap { tokenResponse ->
+                token = tokenResponse.token
+
+                val bearerToken = "Bearer ${tokenResponse.token}"
+                forecaService.getLocations(bearerToken, Constants.HARDCODED_LOCATION)
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { locationsResponse ->
+                    Log.d("RxJava", "Got locations: ${locationsResponse.locations}")
+                },
+                { error -> Log.e("RxJava", "Got error with auth or locations", error) }
+            )
+            /*
             .enqueue(object : Callback<ForecaAuthResponse> {
                 override fun onResponse(call: Call<ForecaAuthResponse>,
                                         response: Response<ForecaAuthResponse>) {
@@ -125,10 +144,23 @@ class WeatherActivity : AppCompatActivity() {
                 }
 
             })
+             */
+
     }
 
     private fun search(accessToken: String, searchQuery: String) {
         forecaService.getLocations("Bearer $accessToken", searchQuery)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {locations ->
+
+                },
+                {error ->
+
+                }
+            )
+            /*
             .enqueue(object : Callback<LocationsResponse> {
                 override fun onResponse(call: Call<LocationsResponse>,
                                         response: Response<LocationsResponse>) {
@@ -156,6 +188,8 @@ class WeatherActivity : AppCompatActivity() {
                         }
                     }
 
+
+
                 }
 
                 override fun onFailure(call: Call<LocationsResponse>, t: Throwable) {
@@ -164,6 +198,8 @@ class WeatherActivity : AppCompatActivity() {
                 }
 
             })
+
+             */
     }
 
 
